@@ -23,6 +23,7 @@
 #include <memory>
 
 #include "app/app.h"
+#include "buzzer.h"
 
 namespace door {
 
@@ -46,6 +47,7 @@ public:
 	void loop() override;
 
 private:
+	Buzzer buzzer_{BUZZER_PIN};
 };
 
 } // namespace door

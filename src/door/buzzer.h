@@ -16,23 +16,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "door/app.h"
+#pragma once
 
 #include <Arduino.h>
 
+#include <memory>
+
+#include <uuid/log.h>
+
 namespace door {
 
-App::App() {
-}
+class Buzzer {
+public:
+	Buzzer(int pin);
 
-void App::start() {
-	app::App::start();
-	buzzer_.start();
-}
+	void start();
+	void loop();
 
-void App::loop() {
-	app::App::loop();
-	buzzer_.loop();
-}
+private:
+	static uuid::log::Logger logger_;
+
+	const int pin_;
+	uint64_t last_us_{0};
+	bool active_{false};
+};
 
 } // namespace door

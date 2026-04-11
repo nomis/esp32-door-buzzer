@@ -16,23 +16,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "door/app.h"
+#include "door/buzzer.h"
 
 #include <Arduino.h>
 
+#ifndef PSTR_ALIGN
+# define PSTR_ALIGN 4
+#endif
+
+static const char __pstr__logger_name[] __attribute__((__aligned__(PSTR_ALIGN))) PROGMEM = "buzzer";
+
 namespace door {
 
-App::App() {
+uuid::log::Logger Buzzer::logger_{FPSTR(__pstr__logger_name), uuid::log::Facility::AUTH};
+
+Buzzer::Buzzer(int pin) : pin_(pin) {
 }
 
-void App::start() {
-	app::App::start();
-	buzzer_.start();
+void Buzzer::start() {
+	pinMode(pin_, INPUT_PULLUP);
 }
 
-void App::loop() {
-	app::App::loop();
-	buzzer_.loop();
+void Buzzer::loop() {
+	bool active = digitalRead(pin_) == LOW;
+
+	if (active_ != active) {
+		uint64_t now_us = esp_timer_get_time();
+
+		if (active) {
+			logger_.info("Pressed after %llums", (now_us - last_us_) / 1000ULL);
+		} else {
+			logger_.info("Released after %llums", (now_us - last_us_) / 1000ULL);
+		}
+
+		active_ = active;
+		last_us_ = now_us;
+	}
 }
 
 } // namespace door
