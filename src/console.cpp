@@ -40,15 +40,7 @@ using ::app::CommandFlags;
 using ::app::Config;
 using ::app::ShellContext;
 
-#define MAKE_PSTR(string_name, string_literal) static const char __pstr__##string_name[] __attribute__((__aligned__(sizeof(int)))) PROGMEM = string_literal;
-#define MAKE_PSTR_WORD(string_name) MAKE_PSTR(string_name, #string_name)
-#define F_(string_name) FPSTR(__pstr__##string_name)
-
 namespace door {
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic error "-Wunused-const-variable"
-#pragma GCC diagnostic pop
 
 static constexpr inline AppShell &to_app_shell(Shell &shell) {
 	return static_cast<AppShell&>(shell);
@@ -64,7 +56,12 @@ static constexpr inline DoorShell &to_shell(Shell &shell) {
 
 #define NO_ARGUMENTS std::vector<std::string>{}
 
+static void open_door(Shell &shell, const std::vector<std::string> &arguments) {
+	to_app(shell).open();
+}
+
 static inline void setup_commands(std::shared_ptr<Commands> &commands) {
+	commands->add_command({F("open")}, open_door);
 }
 
 DoorShell::DoorShell(app::App &app, Stream &stream, unsigned int context, unsigned int flags)

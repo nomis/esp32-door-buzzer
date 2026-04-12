@@ -24,10 +24,9 @@
 
 #include "app/app.h"
 #include "buzzer.h"
+#include "lock.h"
 
 namespace door {
-
-class WebInterface;
 
 class App: public app::App {
 private:
@@ -46,8 +45,11 @@ public:
 	void start() override;
 	void loop() override;
 
+	void open();
+
 private:
 	Buzzer buzzer_{BUZZER_PIN};
+	Lock lock_{OPEN_PIN};
 };
 
 } // namespace door

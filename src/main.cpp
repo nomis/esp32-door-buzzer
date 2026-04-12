@@ -20,13 +20,14 @@
 
 #include "door/app.h"
 
-static door::App application;
+static door::App *application{nullptr};
 
 void setup() {
-	application.start();
+	application = new door::App();
+	application->start();
 }
 
 void loop() {
-	application.loop();
+	application->loop();
 	::yield();
 }
