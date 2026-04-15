@@ -61,7 +61,75 @@ static void open_door(Shell &shell, const std::vector<std::string> &arguments) {
 }
 
 static inline void setup_commands(std::shared_ptr<Commands> &commands) {
+	auto buzzer_release_time = [] (Shell &shell,
+			const std::vector<std::string> &arguments __attribute__((unused))) {
+		Config config;
+		unsigned long value = config.buzzer_release_time_ms();
+
+		shell.printfln(F("Buzzer release time: %lums"), value);
+	};
+
+	auto door_open_time = [] (Shell &shell,
+			const std::vector<std::string> &arguments __attribute__((unused))) {
+		Config config;
+		unsigned long value = config.door_open_time_ms();
+
+		shell.printfln(F("Door open time: %lums"), value);
+	};
+
 	commands->add_command({F("open")}, open_door);
+
+	commands->add_command(ShellContext::MAIN, CommandFlags::USER, CommandFlags::ADMIN,
+		flash_string_vector{F("buzzer"), F("release"), F("time")},
+		buzzer_release_time);
+
+	commands->add_command(ShellContext::MAIN, CommandFlags::ADMIN,
+				flash_string_vector{F("buzzer"), F("release"), F("time")},
+				flash_string_vector{F("[milliseconds]")},
+				[=] (Shell &shell, const std::vector<std::string> &arguments) {
+		Config config;
+
+		if (!arguments.empty()) {
+			unsigned long value = 0;
+			int ret = std::sscanf(arguments[0].c_str(), "%lu", &value);
+
+			if (ret < 1) {
+				shell.println(F("Invalid value"));
+				return;
+			}
+
+			config.buzzer_release_time_ms(value);
+			config.commit();
+		}
+
+		buzzer_release_time(shell, NO_ARGUMENTS);
+	});
+
+	commands->add_command(ShellContext::MAIN, CommandFlags::USER, CommandFlags::ADMIN,
+		flash_string_vector{F("door"), F("open"), F("time")},
+		door_open_time);
+
+	commands->add_command(ShellContext::MAIN, CommandFlags::ADMIN,
+				flash_string_vector{F("door"), F("open"), F("time")},
+				flash_string_vector{F("[milliseconds]")},
+				[=] (Shell &shell, const std::vector<std::string> &arguments) {
+		Config config;
+
+		if (!arguments.empty()) {
+			unsigned long value = 0;
+			int ret = std::sscanf(arguments[0].c_str(), "%lu", &value);
+
+			if (ret < 1) {
+				shell.println(F("Invalid value"));
+				return;
+			}
+
+			config.door_open_time_ms(value);
+			config.commit();
+		}
+
+		door_open_time(shell, NO_ARGUMENTS);
+	});
 }
 
 DoorShell::DoorShell(app::App &app, Stream &stream, unsigned int context, unsigned int flags)

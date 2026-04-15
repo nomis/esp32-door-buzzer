@@ -41,7 +41,6 @@ protected:
 
 private:
     static constexpr const unsigned long WATCHDOG_INTERVAL_MS = CONFIG_ESP_TASK_WDT_TIMEOUT_S * 1000 / 4;
-    static constexpr uint64_t OPEN_US = 5ULL * 1000 * 1000;
 	static uuid::log::Logger logger_;
 
 	const int pin_;

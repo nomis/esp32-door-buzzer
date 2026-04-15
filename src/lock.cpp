@@ -24,9 +24,13 @@
 #include <algorithm>
 #include <thread>
 
+#include "app/config.h"
+
 #ifndef PSTR_ALIGN
 # define PSTR_ALIGN 4
 #endif
+
+using ::app::Config;
 
 static const char __pstr__logger_name[] __attribute__((__aligned__(PSTR_ALIGN))) PROGMEM = "lock";
 
@@ -49,7 +53,9 @@ void Lock::start() {
 }
 
 void Lock::open() {
-	stop_ = esp_timer_get_time() + OPEN_US;
+	Config config;
+
+	stop_ = esp_timer_get_time() + config.door_open_time_ms() * 1000ULL;
 	wake_up();
 }
 
