@@ -21,6 +21,7 @@
 #include <Arduino.h>
 
 #include "app/config.h"
+#include "door/mqtt.h"
 
 #ifndef PSTR_ALIGN
 # define PSTR_ALIGN 4
@@ -36,7 +37,7 @@ namespace door {
 uuid::log::Logger Buzzer::switch_logger_{FPSTR(__pstr__switch_logger_name), uuid::log::Facility::AUTH};
 uuid::log::Logger Buzzer::buzzer_logger_{FPSTR(__pstr__buzzer_logger_name), uuid::log::Facility::AUTH};
 
-Buzzer::Buzzer(int pin) : pin_(pin) {
+Buzzer::Buzzer(int pin, MQTT &mqtt) : pin_(pin), mqtt_(mqtt) {
 }
 
 void Buzzer::start() {
@@ -75,6 +76,7 @@ void Buzzer::loop() {
 
 			buzzer_active_ = switch_active_;
 			last_buzzer_us_ = now_us;
+			mqtt_.buzzer_pressed(buzzer_active_);
 		}
 	}
 }

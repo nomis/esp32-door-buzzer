@@ -25,6 +25,7 @@
 #include "app/app.h"
 #include "buzzer.h"
 #include "lock.h"
+#include "mqtt.h"
 
 namespace door {
 
@@ -46,9 +47,11 @@ public:
 	void loop() override;
 
 	void open();
+	void mqtt_reconnect();
 
 private:
-	Buzzer buzzer_{BUZZER_PIN};
+	MQTT mqtt_;
+	Buzzer buzzer_;
 	Lock lock_{OPEN_PIN};
 };
 

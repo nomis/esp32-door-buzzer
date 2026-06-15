@@ -130,6 +130,60 @@ static inline void setup_commands(std::shared_ptr<Commands> &commands) {
 
 		door_open_time(shell, NO_ARGUMENTS);
 	});
+
+	commands->add_command(ShellContext::MAIN, CommandFlags::ADMIN,
+				flash_string_vector{F("set"), F("mqtt"), F("hostname")},
+				flash_string_vector{F("[hostname]")},
+				[=] (Shell &shell, const std::vector<std::string> &arguments) {
+		Config config;
+
+		if (!arguments.empty()) {
+			config.mqtt_hostname(arguments[0].c_str());
+			config.commit();
+		}
+
+		shell.printfln(F("MQTT hostname: %ls"), config.mqtt_hostname().c_str());
+		to_app(shell).mqtt_reconnect();
+	});
+
+	commands->add_command(ShellContext::MAIN, CommandFlags::ADMIN,
+				flash_string_vector{F("set"), F("mqtt"), F("username")},
+				flash_string_vector{F("[username]")},
+				[=] (Shell &shell, const std::vector<std::string> &arguments) {
+		Config config;
+
+		if (!arguments.empty()) {
+			config.mqtt_username(arguments[0].c_str());
+			config.commit();
+		}
+
+		shell.printfln(F("MQTT username: %ls"), config.mqtt_username().c_str());
+		to_app(shell).mqtt_reconnect();
+	});
+
+	commands->add_command(ShellContext::MAIN, CommandFlags::ADMIN,
+				flash_string_vector{F("set"), F("mqtt"), F("password")},
+				[=] (Shell &shell, const std::vector<std::string> &arguments) {
+		Config config;
+
+		shell.enter_password(F("Enter new password: "), [] (Shell &shell, bool completed, const std::string &password1) {
+			if (completed) {
+				shell.enter_password(F("Retype new password: "), [password1] (Shell &shell, bool completed, const std::string &password2) {
+					if (completed) {
+						if (password1 == password2) {
+							Config config;
+							config.mqtt_password(password2);
+							config.commit();
+							shell.println(F("MQTT password updated"));
+							to_app(shell).mqtt_reconnect();
+						} else {
+							shell.println(F("Passwords do not match"));
+						}
+					}
+				});
+			}
+		});
+	});
 }
 
 DoorShell::DoorShell(app::App &app, Stream &stream, unsigned int context, unsigned int flags)

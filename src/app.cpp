@@ -22,7 +22,7 @@
 
 namespace door {
 
-App::App() {
+App::App() : mqtt_(*this), buzzer_(BUZZER_PIN, mqtt_) {
 }
 
 void App::start() {
@@ -30,15 +30,21 @@ void App::start() {
 	app::App::start();
 	buzzer_.start();
 	lock_.start();
+	mqtt_.start();
 }
 
 void App::loop() {
 	app::App::loop();
 	buzzer_.loop();
+	mqtt_.loop();
 }
 
 void App::open() {
 	lock_.open();
+}
+
+void App::mqtt_reconnect() {
+	mqtt_.reconnect();
 }
 
 } // namespace door

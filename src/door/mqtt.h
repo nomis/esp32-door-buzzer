@@ -19,6 +19,8 @@
 #pragma once
 
 #include <Arduino.h>
+#include <PubSubClient.h>
+#include <WiFi.h>
 
 #include <memory>
 
@@ -26,26 +28,40 @@
 
 namespace door {
 
-class MQTT;
+class App;
 
-class Buzzer {
+class MQTT {
 public:
-	Buzzer(int pin, MQTT &mqtt);
+	MQTT(App &app);
 
 	void start();
 	void loop();
 
-private:
-	static uuid::log::Logger switch_logger_;
-	static uuid::log::Logger buzzer_logger_;
+	void reconnect();
+	void buzzer_pressed(bool on);
 
-	const int pin_;
-	MQTT &mqtt_;
-	uint64_t last_switch_us_{0};
-	uint64_t last_buzzer_us_{0};
-	uint64_t release_time_us_{0};
-	bool switch_active_{false};
-	bool buzzer_active_{false};
+private:
+	static constexpr uint64_t TIMEOUT_US = 10 * 1000 * 1000ULL;
+	static const std::string OPEN_TOPIC;
+	static const std::string BUZZER_TOPIC;
+	static const std::string UPTIME_TOPIC;
+	static uuid::log::Logger logger_;
+
+	void receive(char *topic, uint8_t *payload, unsigned int length);
+	void report();
+
+	App &app_;
+	WiFiClient wifi_;
+	PubSubClient client_{wifi_};
+	bool connect_{false};
+	bool reconnect_{true};
+	String id_;
+	std::string hostname_;
+	std::string username_;
+	std::string password_;
+	uint64_t last_connect_us_{0};
+	uint64_t last_report_us_{0};
+	bool buzzer_{false};
 };
 
 } // namespace door
