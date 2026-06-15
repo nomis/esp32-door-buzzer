@@ -18,7 +18,10 @@
 
 #define MCU_APP_CONFIG_DATA \
 	MCU_APP_CONFIG_PRIMITIVE(unsigned long, "", door_open_time_ms, "", 5000) \
-	MCU_APP_CONFIG_PRIMITIVE(unsigned long, "", buzzer_release_time_ms, "", 500)
+	MCU_APP_CONFIG_PRIMITIVE(unsigned long, "", buzzer_release_time_ms, "", 500) \
+	MCU_APP_CONFIG_SIMPLE(std::string, "", mqtt_hostname, "", "") \
+	MCU_APP_CONFIG_SIMPLE(std::string, "", mqtt_username, "", "") \
+	MCU_APP_CONFIG_SIMPLE(std::string, "", mqtt_password, "", "")
 
 public:
 	unsigned long door_open_time_ms() const;
@@ -27,6 +30,18 @@ public:
 	unsigned long buzzer_release_time_ms() const;
 	void buzzer_release_time_ms(unsigned long buzzer_release_time_ms);
 
+	std::string mqtt_hostname() const;
+	void mqtt_hostname(const std::string &mqtt_hostname);
+
+	std::string mqtt_username() const;
+	void mqtt_username(const std::string &mqtt_username);
+
+	std::string mqtt_password() const;
+	void mqtt_password(const std::string &mqtt_password);
+
 private:
 	static unsigned long door_open_time_ms_;
 	static unsigned long buzzer_release_time_ms_;
+	static std::string mqtt_hostname_;
+	static std::string mqtt_username_;
+	static std::string mqtt_password_;
