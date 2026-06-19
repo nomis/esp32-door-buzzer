@@ -73,7 +73,7 @@ unsigned long Lock::run_tasks() {
 	} else {
 		if (active_) {
 			digitalWrite(pin_, LOW);
-			logger_.notice("Released door lock");
+			logger_.notice("Closed door lock");
 			active_ = false;
 		}
 	}
