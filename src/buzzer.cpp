@@ -55,6 +55,7 @@ void Buzzer::loop() {
 
 			Config config;
 
+			debounce_time_us_ = config.buzzer_debounce_time_ms() * 1000ULL;
 			release_time_us_ = config.buzzer_release_time_ms() * 1000ULL;
 		} else {
 			switch_logger_.info("Released after %llums", (now_us - last_switch_us_) / 1000ULL);
@@ -67,7 +68,8 @@ void Buzzer::loop() {
 	if (buzzer_active_ != switch_active_) {
 		uint64_t now_us = esp_timer_get_time();
 
-		if (switch_active_ || now_us - last_switch_us_ >= release_time_us_) {
+		if ((switch_active_ && now_us - last_switch_us_ >= debounce_time_us_)
+				|| (!switch_active_ && now_us - last_switch_us_ >= release_time_us_)) {
 			if (switch_active_) {
 				buzzer_logger_.info("Pressed after %llums", (now_us - last_buzzer_us_) / 1000ULL);
 			} else {

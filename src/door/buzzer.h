@@ -43,6 +43,7 @@ private:
 	MQTT &mqtt_;
 	uint64_t last_switch_us_{0};
 	uint64_t last_buzzer_us_{0};
+	uint64_t debounce_time_us_{0};
 	uint64_t release_time_us_{0};
 	bool switch_active_{false};
 	bool buzzer_active_{false};
